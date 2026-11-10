@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="WLSA Store — Clothing, objects and everyday essentials from campus.">
+  <meta name="robots" content="noindex,nofollow">
+  <title>WLSA Store</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='black'/%3E%3Ctext x='3' y='24' font-family='Georgia' font-size='28' fill='white'%3EW%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="store.css?v=black-3">
+  <script src="catalog.js" defer></script>
+  <script src="store.js?v=drawer-3" defer></script>
+</head>
+<body>
+<div class="store-site">
+  <div id="store-loading-bar" class="store-loading-bar" aria-hidden="true"></div>
+  <a class="skip-link" href="#shop-main">Skip to products</a>
+  <div id="page-shell">
+    <header class="store-title"><div class="wrap store-title-inner">
+      <a class="store-return-mark" href="https://wlsa-athletics.vercel.app" aria-label="WLSA Athletics"><span class="store-return-initials">WLSA</span><span class="store-return-athletics">ATHLETICS</span></a>
+      <a class="store-name" href="#shop/all">WLSA Store</a>
+      <nav class="shop-nav store-navigation" aria-label="Store navigation"><a href="#shop/all">Shop</a><a href="#archive">Archive</a></nav>
+      <div class="store-tools"><button data-action="search">Search</button><button data-action="cart" id="cart-trigger">Cart<span id="cart-count"></span></button></div>
+    </div></header>
+    <main id="shop-main" class="wrap" tabindex="-1"></main>
+    <footer class="wrap shop-footer"><span>© <span id="year"></span> WLSA Store</span><a href="#about">About</a><a href="#faq">FAQ</a><button data-action="privacy">Privacy</button><button data-action="terms">Terms</button></footer>
+  </div>
+  <dialog class="sheet product-sheet" id="product-dialog" aria-labelledby="product-title"><div class="sheet-panel"><button class="close-button" data-close aria-label="Close product details"></button><div id="product-content" class="product-scroll"></div></div></dialog>
+  <dialog class="sheet cart-sheet" id="cart-dialog" aria-labelledby="cart-title"><div class="sheet-panel"><button class="close-button" data-close aria-label="Close cart"></button><div id="cart-content" class="cart-content"></div></div></dialog>
+  <dialog class="sheet information-sheet" id="info-dialog" aria-labelledby="info-title"><div class="sheet-panel"><button class="close-button" data-close aria-label="Close panel"></button><div id="info-content" class="information-content"></div></div></dialog>
+  <dialog class="zoom-dialog" id="zoom-dialog" aria-label="Product image viewer"><button class="close-button" data-close aria-label="Close image viewer"></button><button class="image-arrow previous" data-action="image-prev" aria-label="Previous image">←</button><button class="zoom-image" data-action="zoom" aria-label="Zoom product image"><img id="zoom-image" alt=""></button><button class="image-arrow next" data-action="image-next" aria-label="Next image">→</button><p id="image-counter" class="mono"></p></dialog>
+  <div id="store-status" class="sr-only" role="status" aria-live="polite"></div>
+  <noscript><p class="wrap">Please enable JavaScript to browse the WLSA collection.</p></noscript>
+</div>
+</body>
+</html>
