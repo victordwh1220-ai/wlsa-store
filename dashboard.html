@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>WLSA Store · Operations</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="catalog.js" defer></script>
+  <script src="dashboard.js" defer></script>
+</head>
+<body>
+  <header class="dashboard-header">
+    <div class="dashboard-wrap dashboard-header-inner">
+      <a class="dashboard-wordmark" href="index.html">WLSA <span>STORE</span></a>
+      <p>Operations</p>
+      <a class="dashboard-return" href="index.html">View storefront ↗</a>
+    </div>
+  </header>
+  <main class="dashboard-wrap dashboard-main">
+    <header class="dashboard-heading">
+      <div>
+        <p class="eyebrow">Store operations</p>
+        <h1>Collection control</h1>
+        <p class="muted">Review the published catalog before connecting the store backend.</p>
+      </div>
+      <button class="button button-light" id="export-csv" type="button">Export CSV</button>
+    </header>
+    <section class="stats-grid" aria-label="Catalog summary">
+      <article><span>Products</span><strong id="stat-products">—</strong></article>
+      <article><span>Categories</span><strong id="stat-categories">—</strong></article>
+      <article><span>Image files</span><strong id="stat-images">—</strong></article>
+      <article><span>Catalog state</span><strong id="stat-state">—</strong></article>
+    </section>
+    <section class="catalog-panel" aria-labelledby="catalog-heading">
+      <div class="panel-heading">
+        <div>
+          <h2 id="catalog-heading">Catalog</h2>
+          <p class="muted" id="result-count">—</p>
+        </div>
+        <div class="catalog-filters">
+          <label>
+            <span class="sr-only">Search products</span>
+            <input id="product-search" type="search" placeholder="Search products" autocomplete="off">
+          </label>
+          <label>
+            <span class="sr-only">Filter category</span>
+            <select id="category-filter"><option value="">All categories</option></select>
+          </label>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Sizes</th><th>Images</th><th></th></tr></thead>
+          <tbody id="catalog-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <div id="dashboard-status" class="sr-only" role="status" aria-live="polite"></div>
+</body>
+</html>
