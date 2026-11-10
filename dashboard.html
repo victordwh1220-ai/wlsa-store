@@ -1,62 +1,121 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>WLSA Store · Operations</title>
-  <link rel="stylesheet" href="dashboard.css">
-  <script src="catalog.js" defer></script>
-  <script src="dashboard.js" defer></script>
-</head>
-<body>
-  <header class="dashboard-header">
-    <div class="dashboard-wrap dashboard-header-inner">
-      <a class="dashboard-wordmark" href="index.html">WLSA <span>STORE</span></a>
-      <p>Operations</p>
-      <a class="dashboard-return" href="index.html">View storefront ↗</a>
-    </div>
-  </header>
-  <main class="dashboard-wrap dashboard-main">
-    <header class="dashboard-heading">
-      <div>
-        <p class="eyebrow">Store operations</p>
-        <h1>Collection control</h1>
-        <p class="muted">Review the published catalog before connecting the store backend.</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Catalog · WLSA Store</title>
+    <link rel="stylesheet" href="/dashboard.css" />
+    <script defer src="/catalog.js"></script>
+    <script defer src="/dashboard.js"></script>
+  </head>
+  <body>
+    <header class="dashboard-header">
+      <div class="dashboard-wrap dashboard-header-inner">
+        <a class="dashboard-wordmark" href="/">WLSA <span>STORE</span></a>
+        <a class="dashboard-return" href="/">View store ↗</a>
+        <button id="sign-out" type="button" hidden>Sign out</button>
       </div>
-      <button class="button button-light" id="export-csv" type="button">Export CSV</button>
     </header>
-    <section class="stats-grid" aria-label="Catalog summary">
-      <article><span>Products</span><strong id="stat-products">—</strong></article>
-      <article><span>Categories</span><strong id="stat-categories">—</strong></article>
-      <article><span>Image files</span><strong id="stat-images">—</strong></article>
-      <article><span>Catalog state</span><strong id="stat-state">—</strong></article>
-    </section>
-    <section class="catalog-panel" aria-labelledby="catalog-heading">
-      <div class="panel-heading">
-        <div>
-          <h2 id="catalog-heading">Catalog</h2>
-          <p class="muted" id="result-count">—</p>
+    <main class="dashboard-wrap dashboard-main">
+      <section id="access">
+        <h1>Staff sign-in</h1>
+        <form id="login" hidden>
+          <label
+            >Store staff password<input
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              required
+          /></label>
+          <button class="button button-light" type="submit">Sign in</button>
+        </form>
+        <p id="access-message" role="status">Checking staff session…</p>
+        <button id="retry-access" class="button" hidden>Try again</button>
+      </section>
+      <section id="workspace" hidden>
+        <header class="dashboard-heading">
+          <h1>Product catalog</h1>
+          <button class="button" id="export-csv">Export CSV</button>
+        </header>
+        <div class="catalog-tools">
+          <label
+            >Search<input
+              type="search"
+              id="product-search"
+              placeholder="Name or product ID"
+          /></label>
+          <label
+            >Category<select id="category-filter">
+              <option value="">All categories</option>
+            </select></label
+          >
+          <label
+            >Visibility<select id="visibility">
+              <option value="">All products</option>
+              <option value="listed">Listed</option>
+              <option value="hidden">Hidden</option>
+            </select></label
+          >
         </div>
-        <div class="catalog-filters">
-          <label>
-            <span class="sr-only">Search products</span>
-            <input id="product-search" type="search" placeholder="Search products" autocomplete="off">
-          </label>
-          <label>
-            <span class="sr-only">Filter category</span>
-            <select id="category-filter"><option value="">All categories</option></select>
-          </label>
+        <p id="result-count" aria-live="polite"></p>
+        <div class="table-scroll" tabindex="0" aria-label="Product catalog">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Category</th>
+                <th scope="col">Price</th>
+                <th scope="col">Visibility</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="catalog-rows"></tbody>
+          </table>
         </div>
-      </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Sizes</th><th>Images</th><th></th></tr></thead>
-          <tbody id="catalog-rows"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-  <div id="dashboard-status" class="sr-only" role="status" aria-live="polite"></div>
-</body>
+        <p id="feedback" role="status"></p>
+      </section>
+    </main>
+    <dialog id="editor" aria-labelledby="edit-title">
+      <form id="edit-form">
+        <div class="edit-title-row">
+          <h2 id="edit-title">Edit product</h2>
+          <button
+            class="button"
+            id="close-editor"
+            type="button"
+            aria-label="Close product editor"
+          >
+            Close
+          </button>
+        </div>
+        <p id="edit-id"></p>
+        <label
+          >English name<input name="name_en" required maxlength="120"
+        /></label>
+        <label
+          >Chinese name<input name="name" required maxlength="120" lang="zh-CN"
+        /></label>
+        <label
+          >Price (CNY)<input
+            type="number"
+            name="price"
+            step=".01"
+            min="0"
+            max="1000000"
+            required
+        /></label>
+        <label class="check"
+          ><input type="checkbox" name="listed" />Listed in the store</label
+        >
+        <p id="edit-message" role="status"></p>
+        <button class="button button-light" id="save" type="submit">
+          Save changes
+        </button>
+        <button class="button" id="reload" type="button" hidden>
+          Load latest version
+        </button>
+      </form>
+    </dialog>
+  </body>
 </html>

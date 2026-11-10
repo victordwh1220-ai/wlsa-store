@@ -1,12 +1,32 @@
 'use strict';
 
-(() => {
-  const { products, categories } = window.storeCatalog;
+(async () => {
+  const { categories } = window.storeCatalog;
+  if (['localhost', '127.0.0.1'].includes(location.hostname)) {
+    document.querySelector('.store-return-mark').href = 'http://127.0.0.1:3001/';
+  }
+  const products = [];
+  try {
+    const response = await fetch('/api/catalog', { credentials: 'include', signal: AbortSignal.timeout(15000) });
+    if (!response.ok) throw new Error();
+    const current = await response.json();
+    const entries = new Map(current.products.map(row => [row.id, row]));
+    for (const product of window.storeCatalog.products) {
+      const row = entries.get(product.id);
+      if (row?.listed) products.push({...product, name: row.name, name_en: row.name_en, price: row.price});
+    }
+  } catch {
+    document.querySelector('#shop-main').innerHTML = '<p class="empty-results" role="alert">The catalog could not be loaded. <button type="button">Try again</button></p>';
+    document.querySelector('#shop-main button').onclick = () => location.reload();
+    document.querySelector('#store-loading-bar').remove();
+    return;
+  }
+  for (const control of document.querySelectorAll('.store-tools button')) control.disabled = false;
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = n => `¥${n.toFixed(2)}`;
-  const assetPath = path => `${location.pathname.startsWith('/store') ? '/store/' : '/'}${path}`;
+  const assetPath = path => '/' + path;
   const bySlug = slug => products.find(p => p.slug === slug);
   const byId = id => products.find(p => p.id === id);
   const main = $('#shop-main');
@@ -102,7 +122,7 @@
     if (dialog === productDialog && location.hash.startsWith('#product/')) {
       if (history.state?.fromStore) history.back();
       else {
-        history.replaceState({},'', '#' + (mainRoute || 'shop/tops'));
+        history.replaceState({},'', '#' + (mainRoute || 'shop/all'));
         renderRoute();
       }
     } else hideDialog(dialog);
@@ -111,7 +131,7 @@
     return `<section class="accordion"><h2><button class="accordion-trigger" aria-expanded="false" aria-controls="${id}" id="${id}-trigger" data-action="accordion">${title}<span class="plus-icon" aria-hidden="true"></span></button></h2><div class="accordion-panel" id="${id}" data-open="false" role="region" aria-labelledby="${id}-trigger" aria-hidden="true" inert><div><div class="accordion-copy">${copy}</div></div></div></section>`;
   }
   function card(p,index) {
-    return `<a class="product-card" data-product="${p.slug}" href="#product/${p.slug}" aria-label="${esc(p.name_en)}, ${money(productPrice(p))}" style="--delay:${index%3*50}ms;--mobile-delay:${index%2*50}ms"><div class="product-visual"><div class="primary">${image(p,'a',true,index<6)}</div><div class="alternate">${image(p,'b',true,index<6)}</div></div><div class="product-caption"><h2>${esc(p.name_en.toLowerCase())}</h2><p data-store-price="${esc(p.id)}">${money(productPrice(p))}</p></div></a>`;
+    return `<a class="product-card" data-product="${p.slug}" href="#product/${p.slug}" aria-label="${esc(p.name_en)}, ${money(productPrice(p))}" style="--delay:${index%3*50}ms;--mobile-delay:${index%2*50}ms"><div class="product-visual"><div class="primary">${image(p,'a',true,index<3)}</div><div class="alternate">${image(p,'b',true,false)}</div></div><div class="product-caption"><h2>${esc(p.name_en.toLowerCase())}</h2><p data-store-price="${esc(p.id)}">${money(productPrice(p))}</p></div></a>`;
   }
   function categoryBar(selected) {
     const links = [{id:'all', en:'Shop all'}, ...categories].map(category => {
@@ -123,7 +143,7 @@
   function shop(category) {
     const selected = category==='all' || categories.some(c=>c.id===category) ? category : 'tops';
     const list = products.filter(p=>selected==='all'||p.category===selected);
-    return `<h1 class="sr-only">${selected==='all'?'All WLSA products':esc(categories.find(c=>c.id===selected).en)}</h1><div class="catalog-layout">${categoryBar(selected)}<div class="product-grid">${list.map(card).join('')}</div></div>`;
+    return `<h1 class="sr-only">${selected==='all'?'All WLSA products':esc(categories.find(c=>c.id===selected).en)}</h1><div class="catalog-layout">${categoryBar(selected)}<div class="product-grid">${list.map(card).join('') || '<p class="empty-results">No listed products.</p>'}</div></div>`;
   }
   const faqs = [
     ['Can I buy these products now?', 'Items open for sale can be purchased with WeChat Pay. Your cart shows which sizes are available and the total before you open a payment code. Other designs are available to preview.'],
@@ -149,7 +169,7 @@
     window.scrollTo({top:0,behavior:'instant'});
   }
   function renderRoute() {
-    let route=location.hash.slice(1)||'shop/tops';
+    let route=location.hash.slice(1)||'shop/all';
     if(route==='collections'){
       route='shop/all';
       history.replaceState({},'', '#'+route);
@@ -187,7 +207,7 @@
     showDialog(productDialog);
   }
   function openProduct(slug,trigger) {
-    const background=mainRoute||'shop/tops';
+    const background=mainRoute||'shop/all';
     hideDialog(infoDialog,true);
     hideDialog(cartDialog,true);
     if(trigger?.isConnected)trigger.focus({preventScroll:true});
@@ -248,7 +268,7 @@
       <button class="checkout-button" data-action="checkout" ${placingOrder || (!bag.length && !checkout) ? 'disabled' : ''}>${button}</button>
       ${bag.length || checkout ? '<p class="cart-note">' + note + '</p>' : ''}</div>`;
   }
-  function showCart() { renderCart(); showDialog(cartDialog); refreshOffers(); }
+  function showCart() { renderCart(); showDialog(cartDialog); if (offers.size) refreshOffers(); }
   function clearPaymentView() {
     clearTimeout(paymentTimer);
     if (qrObjectUrl) URL.revokeObjectURL(qrObjectUrl);
@@ -366,7 +386,7 @@
   function searchResults(query) {
     const q=query.trim().toLowerCase();
     const results=q?products.filter(p=>`${p.name} ${p.name_en} ${p.category} ${categories.find(c=>c.id===p.category).name}`.toLowerCase().includes(q)):[];
-    $('#search-results').innerHTML=q?(results.length?results.map(p=>`<a class="search-result" href="#product/${p.slug}" data-product="${p.slug}">${image(p,'a',true)}<span>${p.name_en}<small>${money(productPrice(p))}</small></span></a>`).join(''):'<p class="empty-results">No products found. Try another name or category.</p>'):'<p class="empty-results">Search by product name or category.</p>';
+    $('#search-results').innerHTML=q?(results.length?results.map(p=>`<a class="search-result" href="#product/${p.slug}" data-product="${p.slug}">${image(p,'a',true)}<span>${esc(p.name_en)}<small>${money(productPrice(p))}</small></span></a>`).join(''):'<p class="empty-results">No products found. Try another name or category.</p>'):'<p class="empty-results">Search by product name or category.</p>';
     announce(q?`${results.length} products found`:'Search products');
   }
   document.addEventListener('click',event=>{
@@ -431,6 +451,5 @@
   $('#year').textContent=new Date().getFullYear();
   updateCount();
   renderRoute();
-  refreshOffers();
-  document.body.classList.add('store-ready');
+  document.querySelector('#store-loading-bar')?.remove();
 })();

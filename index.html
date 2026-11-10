@@ -8,9 +8,10 @@
   <meta name="robots" content="noindex,nofollow">
   <title>WLSA Store</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='black'/%3E%3Ctext x='3' y='24' font-family='Georgia' font-size='28' fill='white'%3EW%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="store.css?v=black-3">
+  <link rel="stylesheet" href="store.css">
+  <link rel="preload" href="/api/catalog" as="fetch" crossorigin="use-credentials">
   <script src="catalog.js" defer></script>
-  <script src="store.js?v=drawer-3" defer></script>
+  <script src="store.js" defer></script>
 </head>
 <body>
 <div class="store-site">
@@ -19,12 +20,13 @@
   <div id="page-shell">
     <header class="store-title"><div class="wrap store-title-inner">
       <a class="store-return-mark" href="https://wlsa-athletics.vercel.app" aria-label="WLSA Athletics"><span class="store-return-initials">WLSA</span><span class="store-return-athletics">ATHLETICS</span></a>
-      <a class="store-name" href="#shop/all">WLSA Store</a>
-      <nav class="shop-nav store-navigation" aria-label="Store navigation"><a href="#shop/all">Shop</a><a href="#archive">Archive</a></nav>
-      <div class="store-tools"><button data-action="search">Search</button><button data-action="cart" id="cart-trigger">Cart<span id="cart-count"></span></button></div>
     </div></header>
+    <div class="wrap collection-toolbar">
+      <a class="store-name" href="#shop/all">WLSA Store</a>
+      <div class="store-tools"><button data-action="search" disabled>Search</button><button data-action="cart" id="cart-trigger" disabled>Cart<span id="cart-count"></span></button></div>
+    </div>
     <main id="shop-main" class="wrap" tabindex="-1"></main>
-    <footer class="wrap shop-footer"><span>© <span id="year"></span> WLSA Store</span><a href="#about">About</a><a href="#faq">FAQ</a><a href="dashboard.html">Dashboard</a><button data-action="privacy">Privacy</button><button data-action="terms">Terms</button></footer>
+    <footer class="wrap shop-footer"><span>© <span id="year"></span> WLSA Store</span><a href="#about">About</a><a href="#faq">FAQ</a><a href="/dashboard">Staff dashboard</a><button data-action="privacy">Privacy</button><button data-action="terms">Terms</button></footer>
   </div>
   <dialog class="sheet product-sheet" id="product-dialog" aria-labelledby="product-title"><div class="sheet-panel"><button class="close-button" data-close aria-label="Close product details"></button><div id="product-content" class="product-scroll"></div></div></dialog>
   <dialog class="sheet cart-sheet" id="cart-dialog" aria-labelledby="cart-title"><div class="sheet-panel"><button class="close-button" data-close aria-label="Close cart"></button><div id="cart-content" class="cart-content"></div></div></dialog>

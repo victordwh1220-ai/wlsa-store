@@ -350,3 +350,16 @@ body.store-ready .store-loading-bar {
     font-size: 14px;
   }
 }
+/* The institutional return link has its own top row. */
+.store-site .store-title { position: static; border-bottom: 1px solid var(--rule); }
+.store-site .store-title-inner { min-height: 64px; padding-block: 12px; }
+.collection-toolbar { display: flex; align-items: center; justify-content: space-between; padding-block: 26px; gap: 16px; }
+.store-site .collection-toolbar .store-name { margin: 0; order: initial; }
+.store-site .collection-toolbar .store-tools { margin-left: auto; }
+.empty-results button { text-decoration: underline; }
+.store-loading-bar::after {
+  width: 100%; background: #488cff; box-shadow: none; transform-origin: left;
+  animation: catalog-progress 8s cubic-bezier(.09,.8,.18,1) both;
+}
+@keyframes catalog-progress { from { transform: scaleX(.04); } to { transform: scaleX(.94); } }
+@media (prefers-reduced-motion: reduce) { .store-loading-bar::after { animation: none; transform: scaleX(.5); } }

@@ -1,0 +1,14 @@
+{
+  "name": "wlsa-store",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "dev": "node scripts/dev.js",
+    "build": "node scripts/build.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "2.9.0"
+  }
+}

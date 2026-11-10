@@ -1,0 +1,7 @@
+.git
+.vercel
+node_modules
+.env*
+.local
+dist
+test
