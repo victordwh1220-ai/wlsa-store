@@ -4,83 +4,59 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>WLSA Store · Dashboard</title>
+  <title>WLSA Store · Operations</title>
   <link rel="stylesheet" href="dashboard.css">
   <script src="catalog.js" defer></script>
   <script src="dashboard.js" defer></script>
 </head>
 <body>
-  <header class="dashboard-topbar">
-    <a class="dashboard-brand" href="/">WLSA Store <span>Operations</span></a>
-    <a class="back-link" href="/">Back to store ↗</a>
+  <header class="dashboard-header">
+    <div class="dashboard-wrap dashboard-header-inner">
+      <a class="dashboard-wordmark" href="index.html">WLSA <span>STORE</span></a>
+      <p>Operations</p>
+      <a class="dashboard-return" href="index.html">View storefront ↗</a>
+    </div>
   </header>
-  <div class="dashboard-shell">
-    <aside class="dashboard-sidebar" aria-label="Dashboard navigation">
-      <p class="sidebar-label">Workspace</p>
-      <nav>
-        <a class="active" href="#overview">Overview</a>
-        <a href="#products">Products</a>
-        <a href="#categories">Categories</a>
-        <a href="#orders">Orders</a>
-        <a href="#settings">Settings</a>
-      </nav>
-      <div class="sidebar-note">
-        <span class="status-dot" aria-hidden="true"></span>
-        <span>Catalog ready</span>
+  <main class="dashboard-wrap dashboard-main">
+    <header class="dashboard-heading">
+      <div>
+        <p class="eyebrow">Store operations</p>
+        <h1>Collection control</h1>
+        <p class="muted">Review the published catalog before connecting the store backend.</p>
       </div>
-    </aside>
-    <main class="dashboard-main" id="overview">
-      <header class="page-heading">
+      <button class="button button-light" id="export-csv" type="button">Export CSV</button>
+    </header>
+    <section class="stats-grid" aria-label="Catalog summary">
+      <article><span>Products</span><strong id="stat-products">—</strong></article>
+      <article><span>Categories</span><strong id="stat-categories">—</strong></article>
+      <article><span>Image files</span><strong id="stat-images">—</strong></article>
+      <article><span>Catalog state</span><strong id="stat-state">—</strong></article>
+    </section>
+    <section class="catalog-panel" aria-labelledby="catalog-heading">
+      <div class="panel-heading">
         <div>
-          <p class="eyebrow">WLSA Store</p>
-          <h1>Dashboard</h1>
+          <h2 id="catalog-heading">Catalog</h2>
+          <p class="muted" id="result-count">—</p>
         </div>
-        <p class="page-date" id="today"></p>
-      </header>
-      <section class="metric-grid" aria-label="Store metrics" id="metrics"></section>
-      <section class="dashboard-grid">
-        <article class="panel catalog-panel" id="products">
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">Catalog</p>
-              <h2>Products</h2>
-            </div>
-            <span class="result-count" id="result-count"></span>
-          </div>
-          <div class="table-toolbar">
-            <label class="search-control">
-              <span class="sr-only">Search products</span>
-              <input id="product-search" type="search" placeholder="Search products" autocomplete="off">
-            </label>
-            <label class="select-control">
-              <span class="sr-only">Filter by category</span>
-              <select id="category-filter"><option value="all">All categories</option></select>
-            </label>
-          </div>
-          <div class="table-scroll">
-            <table>
-              <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Sizes</th></tr></thead>
-              <tbody id="product-rows"></tbody>
-            </table>
-          </div>
-        </article>
-        <aside class="side-stack">
-          <section class="panel" id="categories">
-            <div class="panel-heading compact"><div><p class="eyebrow">Catalog</p><h2>Categories</h2></div></div>
-            <div class="category-list" id="category-list"></div>
-          </section>
-          <section class="panel readiness" id="orders">
-            <div class="panel-heading compact"><div><p class="eyebrow">System</p><h2>Readiness</h2></div></div>
-            <ul class="readiness-list">
-              <li><span class="status-dot"></span><span>Catalog data</span><strong>Ready</strong></li>
-              <li><span class="status-dot muted"></span><span>Orders API</span><strong>Not connected</strong></li>
-              <li><span class="status-dot muted"></span><span>Inventory sync</span><strong>Not connected</strong></li>
-            </ul>
-          </section>
-        </aside>
-      </section>
-    </main>
-  </div>
-  <div id="settings" class="sr-only">Settings</div>
+        <div class="catalog-filters">
+          <label>
+            <span class="sr-only">Search products</span>
+            <input id="product-search" type="search" placeholder="Search products" autocomplete="off">
+          </label>
+          <label>
+            <span class="sr-only">Filter category</span>
+            <select id="category-filter"><option value="">All categories</option></select>
+          </label>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Sizes</th><th>Images</th><th></th></tr></thead>
+          <tbody id="catalog-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <div id="dashboard-status" class="sr-only" role="status" aria-live="polite"></div>
 </body>
 </html>
