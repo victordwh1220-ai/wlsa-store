@@ -152,7 +152,7 @@ export const reservationBlobStorage = {
     const reservations = decodeReservationDocument(
       await new Response(blob.stream).text(),
     );
-    return { etag: blob.blob.etag, reservations };
+    return { etag: normalizeEtag(blob.blob.etag), reservations };
   },
   async write(etag, reservations) {
     const body = JSON.stringify({ schema: 1, reservations });
@@ -182,6 +182,12 @@ export const reservationBlobStorage = {
     }
   },
 };
+
+// Blob GET can return a weak validator while conditional PUT expects the
+// quoted validator itself. Keep compare-and-swap values canonical.
+function normalizeEtag(etag) {
+  return etag.replace(/^W\//, "");
+}
 
 function only(object, fields) {
   return (

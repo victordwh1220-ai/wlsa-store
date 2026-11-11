@@ -62,7 +62,7 @@ export const blobStorage = {
     ) {
       throw new Error("Invalid saved catalog.");
     }
-    return { etag: blob.blob.etag, overrides: document.overrides };
+    return { etag: normalizeEtag(blob.blob.etag), overrides: document.overrides };
   },
   async write(etag, overrides) {
     try {
@@ -85,6 +85,12 @@ export const blobStorage = {
     }
   },
 };
+
+// Blob GET can return a weak validator (`W/"…"`) while conditional PUT
+// expects the underlying quoted validator (`"…"`). Store one canonical form.
+function normalizeEtag(etag) {
+  return etag.replace(/^W\//, "");
+}
 
 function conflict() {
   return new HttpError(
