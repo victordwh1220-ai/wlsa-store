@@ -13,6 +13,10 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { handlers } from "../server/handlers.js";
 import { HttpError } from "../server/http.js";
+import {
+  decodeReservationDocument,
+  reservationHandlers,
+} from "../server/reservations.js";
 
 const directory = fileURLToPath(new URL("../", import.meta.url));
 
@@ -70,12 +74,65 @@ const types = {
   ".woff2": "font/woff2",
 };
 
-export function createLocalServer(storage) {
+export function localReservationStorage(file) {
+  function read() {
+    try {
+      const data = JSON.parse(readFileSync(file, "utf8"));
+      if (typeof data.etag !== "string")
+        throw new Error("Invalid local reservations");
+      return {
+        etag: data.etag,
+        reservations: decodeReservationDocument(
+          JSON.stringify({ schema: 1, reservations: data.reservations }),
+        ),
+      };
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+      return { etag: null, reservations: [] };
+    }
+  }
+  return {
+    read,
+    write(expected, reservations) {
+      if (read().etag !== expected)
+        throw new HttpError(
+          409,
+          "Another reservation update was saved. Refresh and review.",
+        );
+      const etag = randomUUID();
+      const body = JSON.stringify({ etag, reservations });
+      if (reservations.length > 1000 || Buffer.byteLength(body) > 3_000_000)
+        throw new HttpError(
+          503,
+          "Reservation capacity has been reached. Please contact store staff.",
+        );
+      mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
+      const staged = file + "." + etag;
+      writeFileSync(staged, body, { flag: "wx", mode: 0o600 });
+      renameSync(staged, file);
+      return etag;
+    },
+  };
+}
+
+export function createLocalServer(storage, reservationStorage) {
+  // Explicit local storage is supplied at startup. Never fall back to production Blob.
+  const pickup = reservationHandlers({
+    storage: reservationStorage || {
+      read() {
+        throw new Error("Local reservation storage is not configured.");
+      },
+    },
+    catalogStorage: storage,
+    local: true,
+  });
   const api = handlers({ storage, local: true });
   const routes = new Map([
     ["/api/catalog", api.publicCatalog],
     ["/api/admin/catalog", api.staffCatalog],
     ["/api/admin/session", api.session],
+    ["/api/reservations", pickup.publicReservations],
+    ["/api/admin/reservations", pickup.staffReservations],
   ]);
   return createServer(async (req, res) => {
     try {
@@ -126,6 +183,9 @@ if (
     throw new Error("Invalid PORT.");
   const server = createLocalServer(
     localStorage(path.join(directory, ".local", "catalog-" + port + ".json")),
+    localReservationStorage(
+      path.join(directory, ".local", "reservations-" + port + ".json"),
+    ),
   );
   server.listen(port, "127.0.0.1", () =>
     console.log("WLSA Store on http://127.0.0.1:" + port),

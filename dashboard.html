@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>Catalog · WLSA Store</title>
+    <title>Staff dashboard · WLSA Store</title>
     <link rel="stylesheet" href="/dashboard.css" />
     <script defer src="/catalog.js"></script>
     <script defer src="/dashboard.js"></script>
@@ -34,48 +34,210 @@
         <button id="retry-access" class="button" hidden>Try again</button>
       </section>
       <section id="workspace" hidden>
-        <header class="dashboard-heading">
-          <h1>Product catalog</h1>
-          <button class="button" id="export-csv">Export CSV</button>
+        <header class="dashboard-heading dashboard-page-heading">
+          <div>
+            <p class="eyebrow">WLSA STORE / STAFF</p>
+            <h1>Store dashboard</h1>
+          </div>
+          <button class="button" id="refresh-dashboard" type="button">
+            Refresh
+          </button>
         </header>
-        <div class="catalog-tools">
-          <label
-            >Search<input
-              type="search"
-              id="product-search"
-              placeholder="Name or product ID"
-          /></label>
-          <label
-            >Category<select id="category-filter">
-              <option value="">All categories</option>
-            </select></label
+        <div
+          class="dashboard-tabs"
+          role="tablist"
+          aria-label="Store operations"
+        >
+          <button
+            id="reservations-tab"
+            role="tab"
+            aria-selected="true"
+            aria-controls="reservations-panel"
+            type="button"
           >
-          <label
-            >Visibility<select id="visibility">
-              <option value="">All products</option>
-              <option value="listed">Listed</option>
-              <option value="hidden">Hidden</option>
-            </select></label
+            Reservations
+          </button>
+          <button
+            id="products-tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="products-panel"
+            tabindex="-1"
+            type="button"
           >
+            Products
+          </button>
         </div>
-        <p id="result-count" aria-live="polite"></p>
-        <div class="table-scroll" tabindex="0" aria-label="Product catalog">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Product</th>
-                <th scope="col">Category</th>
-                <th scope="col">Price</th>
-                <th scope="col">Visibility</th>
-                <th scope="col">Action</th>
-              </tr>
-            </thead>
-            <tbody id="catalog-rows"></tbody>
-          </table>
-        </div>
-        <p id="feedback" role="status"></p>
+        <p id="dashboard-message" role="status"></p>
+        <section
+          id="reservations-panel"
+          role="tabpanel"
+          aria-labelledby="reservations-tab"
+        >
+          <div class="dashboard-heading section-heading">
+            <h2>Campus pickup</h2>
+            <p id="reservation-updated" class="muted"></p>
+          </div>
+          <p class="muted operations-note">
+            Confirm availability, then contact the customer to arrange pickup.
+            Prices are estimates until confirmed on site. No automatic messages
+            are sent.
+          </p>
+          <div
+            id="reservation-summary"
+            class="reservation-summary"
+            aria-label="Reservation totals"
+          ></div>
+          <div class="reservation-tools">
+            <label
+              >Search reservations<input
+                type="search"
+                id="reservation-search"
+                placeholder="Reference, customer or contact"
+            /></label>
+            <label
+              >Status<select id="reservation-status-filter">
+                <option value="">All statuses</option>
+                <option value="pending">Pending confirmation</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="ready">Ready for pickup</option>
+                <option value="collected">Collected</option>
+                <option value="cancelled">Cancelled</option>
+              </select></label
+            >
+          </div>
+          <p id="reservation-count" class="muted" aria-live="polite"></p>
+          <div id="reservation-list" class="reservation-list"></div>
+          <p id="reservation-empty" class="empty-state" hidden>
+            No reservations yet.
+          </p>
+        </section>
+        <section
+          id="products-panel"
+          role="tabpanel"
+          aria-labelledby="products-tab"
+          hidden
+        >
+          <header class="dashboard-heading section-heading">
+            <h2>Product catalog</h2>
+            <button class="button" id="export-csv">Export CSV</button>
+          </header>
+          <div class="catalog-tools">
+            <label
+              >Search<input
+                type="search"
+                id="product-search"
+                placeholder="Name or product ID"
+            /></label>
+            <label
+              >Category<select id="category-filter">
+                <option value="">All categories</option>
+              </select></label
+            >
+            <label
+              >Visibility<select id="visibility">
+                <option value="">All products</option>
+                <option value="listed">Listed</option>
+                <option value="hidden">Hidden</option>
+              </select></label
+            >
+          </div>
+          <p id="result-count" aria-live="polite"></p>
+          <div class="table-scroll" tabindex="0" aria-label="Product catalog">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Visibility</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody id="catalog-rows"></tbody>
+            </table>
+          </div>
+          <p id="feedback" role="status"></p>
+        </section>
       </section>
     </main>
+    <dialog id="reservation-editor" aria-labelledby="reservation-title">
+      <form id="reservation-form">
+        <div class="edit-title-row">
+          <h2 id="reservation-title">Reservation</h2>
+          <button
+            class="button"
+            id="close-reservation"
+            type="button"
+            aria-label="Close reservation details"
+          >
+            Close
+          </button>
+        </div>
+        <div id="reservation-meta" class="reservation-meta"></div>
+        <div id="reservation-customer" class="reservation-customer"></div>
+        <div id="reservation-items" class="reservation-items"></div>
+        <p id="reservation-total" class="reservation-total"></p>
+        <p id="reservation-customer-note" class="customer-note" hidden></p>
+        <fieldset id="reservation-fields">
+          <label
+            >Status<select
+              id="reservation-status"
+              name="status"
+              required
+            ></select
+          ></label>
+          <div class="pickup-fields">
+            <label
+              >Pickup time · Shanghai<input
+                name="pickupTime"
+                maxlength="100"
+                placeholder="2026-11-12 12:00–13:00"
+            /></label>
+            <label
+              >Pickup location<input
+                name="pickupPlace"
+                maxlength="160"
+                placeholder="Building, room or collection point"
+            /></label>
+          </div>
+          <p class="field-help">
+            Add a time and location before confirming. Contact the customer
+            using the details above.
+          </p>
+          <label
+            >Message shown to customer<textarea
+              name="staffNote"
+              rows="3"
+              maxlength="300"
+              placeholder="Pickup instructions or cancellation reason"
+            ></textarea>
+          </label>
+        </fieldset>
+        <p id="reservation-edit-message" role="status"></p>
+        <div id="reservation-conflict" class="conflict-box" hidden>
+          <p>
+            The latest server details are shown below. Your unsaved fields are
+            kept above.
+          </p>
+          <p id="reservation-latest"></p>
+          <button class="button" id="reservation-review-latest" type="button">
+            Review latest details
+          </button>
+        </div>
+        <div class="reservation-editor-actions">
+          <button
+            class="button button-light"
+            id="reservation-save"
+            type="submit"
+          >
+            Save reservation</button
+          ><button class="button" id="reservation-discard" type="button" hidden>
+            Discard draft and reload
+          </button>
+        </div>
+      </form>
+    </dialog>
     <dialog id="editor" aria-labelledby="edit-title">
       <form id="edit-form">
         <div class="edit-title-row">

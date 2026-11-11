@@ -31,13 +31,13 @@ export function endpoint(methods, action) {
       }
     } catch (error) {
       if (!(error instanceof HttpError)) {
-        console.error("Store catalog request failed.", error?.name);
+        console.error("Store request failed.", error?.name);
       }
       respond(res, error instanceof HttpError ? error.status : 503, {
         error:
           error instanceof HttpError
             ? error.message
-            : "Catalog service is unavailable.",
+            : "Store service is unavailable. Please try again.",
       });
     }
   };
@@ -59,7 +59,7 @@ function checkOrigin(req) {
     req.headers.origin !== scheme + "://" + req.headers.host ||
     req.headers["sec-fetch-site"] === "cross-site"
   ) {
-    throw new HttpError(403, "Open the dashboard on this store to continue.");
+    throw new HttpError(403, "Open WLSA Store to continue.");
   }
 }
 
